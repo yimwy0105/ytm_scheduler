@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>YTM Scheduler</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="header">
+    <h1 data-i18n="appName">🎵 YTM Scheduler</h1>
+    <div class="header-right">
+      <div class="lang-switch" role="tablist" aria-label="language">
+        <button class="lang" data-lang="eng">Eng</button>
+        <button class="lang" data-lang="kor">Kor</button>
+        <button class="lang" data-lang="jpn">Jpn</button>
+      </div>
+      <div class="conn">
+        <span id="conn-status" class="conn-dot muted">●</span>
+        <button id="open-ytm" class="btn btn-ghost btn-sm" data-i18n="openYtm">Open</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 미니 플레이어 -->
+  <section id="mini-player" class="mini-player">
+    <div class="mp-thumb">
+      <img id="mp-thumb-img" alt="" />
+      <div class="mp-thumb-placeholder">🎵</div>
+    </div>
+    <div class="mp-info">
+      <div id="mp-title" class="mp-title" data-i18n="mpIdle">Not playing</div>
+      <div id="mp-artist" class="mp-artist"></div>
+    </div>
+    <button id="mp-play" class="mp-btn" title="Play/Pause">▶</button>
+    <div class="mp-vol">
+      <div class="mp-vol-row">
+        <span class="vol-label">🎵 YTM</span>
+        <input type="range" id="mp-volume" min="0" max="100" value="50" />
+        <span id="mp-vol-pct" class="vol-pct">50%</span>
+      </div>
+      <div class="vol-sys-hint">💻 <span data-i18n="sysVolHint">System volume: check OS settings</span></div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="sleep"><span data-i18n="tabSleep">😴 Sleep</span></button>
+    <button class="tab" data-tab="alarm"><span data-i18n="tabAlarm">⏰ Alarm</span></button>
+    <button class="tab" data-tab="playlist"><span data-i18n="tabPlaylist">🎶 Playlist</span></button>
+  </nav>
+
+  <main>
+    <!-- ===== 슬립 탭 ===== -->
+    <section id="tab-sleep" class="tab-panel active">
+      <div class="content-scroll">
+        <div class="preset-group">
+          <label><input type="radio" name="sleep-preset" value="15" checked /><span data-i18n="p15">15 min</span></label>
+          <label><input type="radio" name="sleep-preset" value="30" /><span data-i18n="p30">30 min</span></label>
+          <label><input type="radio" name="sleep-preset" value="60" /><span data-i18n="p60">1 hour</span></label>
+          <label><input type="radio" name="sleep-preset" value="120" /><span data-i18n="p120">2 hours</span></label>
+        </div>
+
+        <button id="sleep-time-set" class="btn btn-outline">
+          <span data-i18n="timeSet">⏱ Set time</span>
+          <span id="sleep-time-set-label" class="pill hidden"></span>
+        </button>
+
+        <label class="checkbox">
+          <input type="checkbox" id="sleep-fadeout" checked />
+          <span data-i18n="fadeout">Volume fade-out (30s)</span>
+        </label>
+
+        <button id="sleep-start" class="btn btn-primary" data-i18n="startTimer">🌙 Start timer</button>
+
+        <div id="sleep-status" class="status">
+          <span class="muted" data-i18n="statusNone">No active timer</span>
+        </div>
+
+        <details id="sleep-log-details" class="sleep-log-section">
+          <summary>📋 <span data-i18n="sleepLog">Sleep log</span> <span id="sleep-log-count" class="pill">0</span></summary>
+          <div id="sleep-log-list" class="sleep-log-list"></div>
+          <button id="sleep-log-clear" class="btn btn-ghost btn-sm" data-i18n="clearLog">Clear log</button>
+        </details>
+      </div>
+      <div class="scene scene-night" aria-hidden="true">
+        <div class="scene-shimmer"></div>
+      </div>
+    </section>
+
+    <!-- ===== 알람 탭 ===== -->
+    <section id="tab-alarm" class="tab-panel">
+      <div class="content-scroll">
+        <button id="alarm-add" class="btn btn-secondary" data-i18n="addAlarm">+ Add alarm</button>
+
+        <form id="alarm-form" class="inline-form hidden">
+          <input type="hidden" id="alarm-id" />
+
+          <div class="row">
+            <label data-i18n="time">Time</label>
+            <input type="time" id="alarm-time" required />
+          </div>
+
+          <div class="row">
+            <label data-i18n="repeat">Repeat</label>
+            <div class="day-presets">
+              <button type="button" data-preset="daily" data-i18n="daily">Daily</button>
+              <button type="button" data-preset="weekday" data-i18n="weekday">Weekday</button>
+              <button type="button" data-preset="weekend" data-i18n="weekend">Weekend</button>
+            </div>
+          </div>
+
+          <div class="day-checks">
+            <label><input type="checkbox" data-day="0" /><span data-i18n="sun">Sun</span></label>
+            <label><input type="checkbox" data-day="1" /><span data-i18n="mon">Mon</span></label>
+            <label><input type="checkbox" data-day="2" /><span data-i18n="tue">Tue</span></label>
+            <label><input type="checkbox" data-day="3" /><span data-i18n="wed">Wed</span></label>
+            <label><input type="checkbox" data-day="4" /><span data-i18n="thu">Thu</span></label>
+            <label><input type="checkbox" data-day="5" /><span data-i18n="fri">Fri</span></label>
+            <label><input type="checkbox" data-day="6" /><span data-i18n="sat">Sat</span></label>
+          </div>
+
+          <div class="row">
+            <label data-i18n="playlist">Playlist</label>
+            <select id="alarm-playlist" required></select>
+          </div>
+
+          <label class="checkbox">
+            <input type="checkbox" id="alarm-shuffle" />
+            <span data-i18n="shuffle">🔀 Shuffle</span>
+          </label>
+
+          <div class="row">
+            <label><span data-i18n="volume">🔊 Volume</span> <span id="alarm-volume-label">50%</span></label>
+            <input type="range" id="alarm-volume" min="0" max="100" value="50" />
+          </div>
+          <div class="vol-info-box">
+            <span class="vol-info-item">🎵 <span data-i18n="ytmVol">YTM volume</span></span>
+            <span class="vol-info-sep">|</span>
+            <span class="vol-info-item muted">💻 <span data-i18n="sysVolSep">System volume is separate</span></span>
+          </div>
+
+          <div class="row buttons">
+            <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
+            <button type="button" id="alarm-cancel" class="btn btn-ghost" data-i18n="cancel">Cancel</button>
+          </div>
+        </form>
+
+        <div id="alarm-list" class="card-list"></div>
+      </div>
+      <div class="scene scene-morning" aria-hidden="true">
+        <div class="scene-shimmer"></div>
+      </div>
+    </section>
+
+    <!-- ===== 플레이리스트 탭 ===== -->
+    <section id="tab-playlist" class="tab-panel">
+      <div class="content-scroll">
+        <div class="button-row">
+          <button id="pl-add-url" class="btn btn-secondary" data-i18n="addUrl">Add URL</button>
+          <button id="pl-import" class="btn btn-secondary" data-i18n="importLib">Import from library</button>
+        </div>
+
+        <form id="pl-form" class="inline-form hidden">
+          <input type="hidden" id="pl-id" />
+          <div class="row">
+            <label data-i18n="alias">Alias</label>
+            <input type="text" id="pl-alias" maxlength="40" required />
+          </div>
+          <div class="row">
+            <label>URL</label>
+            <input type="url" id="pl-url" required placeholder="https://music.youtube.com/playlist?list=..." />
+          </div>
+          <div class="row buttons">
+            <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
+            <button type="button" id="pl-cancel" class="btn btn-ghost" data-i18n="cancel">Cancel</button>
+          </div>
+        </form>
+
+        <div id="pl-import-list" class="card-list hidden"></div>
+        <div id="pl-list" class="card-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 시간설정 모달 -->
+  <div id="time-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 data-i18n="timeSetTitle">Custom duration</h2>
+        <button class="modal-close" id="time-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="stepper-group">
+          <div class="stepper">
+            <label data-i18n="hours">Hours</label>
+            <div class="stepper-ctrl">
+              <button type="button" data-step="h-" aria-label="decrease">−</button>
+              <span id="step-h" class="stepper-val">0</span>
+              <button type="button" data-step="h+" aria-label="increase">+</button>
+            </div>
+          </div>
+          <div class="stepper">
+            <label data-i18n="minutes">Minutes</label>
+            <div class="stepper-ctrl">
+              <button type="button" data-step="m-" aria-label="decrease">−</button>
+              <span id="step-m" class="stepper-val">30</span>
+              <button type="button" data-step="m+" aria-label="increase">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="total-label">
+          <span data-i18n="total">Total</span>: <span id="step-total">30</span> <span data-i18n="min">min</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="time-modal-cancel" class="btn btn-ghost" data-i18n="cancel">Cancel</button>
+        <button id="time-modal-apply" class="btn btn-primary" data-i18n="apply">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="../utils/constants.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
