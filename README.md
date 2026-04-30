@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # YTM Scheduler
 
 YouTube Music 웹 플레이어(`music.youtube.com`)를 시간 기반으로 자동 제어하는 Chrome Extension (Manifest V3).
@@ -78,3 +79,4 @@ ytm-scheduler/
 - 통계 대시보드 (일별 청취 시간)
 - 다중 프로필 (아침용/수면용/집중용 프리셋)
 - MCP Server 래핑 — 자연어로 제어
+=======
